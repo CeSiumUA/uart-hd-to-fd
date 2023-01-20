@@ -77,10 +77,22 @@ static void uart_dma_enable(void){
 }
 
 static void uart_dma_init(void){
+    // USART6 TX
+    DMA_DeInit(DMA2_Stream6);
+    // USART1 TX
     DMA_DeInit(DMA2_Stream7);
+    // USART6 RX
+    DMA_DeInit(DMA2_Stream1);
+    // USART1 RX
     DMA_DeInit(DMA2_Stream2);
 
     RCC -> AHB1ENR |= RCC_AHB1ENR_DMA2EN;
+
+    DMA2_Stream1 -> CR &=~DMA_SxCR_EN;
+    while(DMA2_Stream1 -> CR & DMA_SxCR_EN){}
+    
+    DMA2_Stream6 -> CR &=~DMA_SxCR_EN;
+    while(DMA2_Stream6 -> CR & DMA_SxCR_EN){}
 
     DMA2_Stream2 -> CR &=~DMA_SxCR_EN;
     while(DMA2_Stream2 -> CR & DMA_SxCR_EN){}
@@ -90,6 +102,43 @@ static void uart_dma_init(void){
 
     DMA2 -> HIFCR |= (DMA_HIFCR_CFEIF7 | DMA_HIFCR_CDMEIF7 | DMA_HIFCR_CTEIF7 | DMA_HIFCR_CHTIF7 | DMA_HIFCR_CTCIF7);
     DMA2 -> LIFCR |= (DMA_LIFCR_CFEIF2 | DMA_LIFCR_CDMEIF2 | DMA_LIFCR_CTEIF2 | DMA_LIFCR_CHTIF2 | DMA_LIFCR_CTCIF2);
+    DMA2 -> HIFCR |= (DMA_HIFCR_CFEIF6 | DMA_HIFCR_CDMEIF6 | DMA_HIFCR_CTEIF6 | DMA_HIFCR_CHTIF6 | DMA_HIFCR_CTCIF6);
+    DMA2 -> LIFCR |= (DMA_LIFCR_CFEIF1 | DMA_LIFCR_CDMEIF1 | DMA_LIFCR_CTEIF1 | DMA_LIFCR_CHTIF1 | DMA_LIFCR_CTCIF1);
 
-    
+    DMA2_Stream1 -> CR |= (DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_0);
+
+    DMA2_Stream2 -> CR |= DMA_SxCR_CHSEL_2;
+
+    DMA2_Stream6 -> CR |= (DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_0);
+
+    DMA2_Stream7 -> CR |= DMA_SxCR_CHSEL_2;
+
+    DMA2_Stream1 -> CR |= DMA_SxCR_CIRC;
+    DMA2_Stream2 -> CR |= DMA_SxCR_CIRC;
+
+    DMA2_Stream1 -> CR |= DMA_SxCR_EN;
+    DMA2_Stream2 -> CR |= DMA_SxCR_EN;
+    DMA2_Stream6 -> CR |= DMA_SxCR_EN;
+    DMA2_Stream7 -> CR |= DMA_SxCR_EN;
+
+    DMA2_Stream1 -> CR |= DMA_SxCR_MINC;
+    DMA2_Stream2 -> CR |= DMA_SxCR_MINC;
+    DMA2_Stream6 -> CR |= DMA_SxCR_MINC;
+    DMA2_Stream7 -> CR |= DMA_SxCR_MINC;
+
+    DMA2_Stream1 -> CR |= DMA_SxCR_TCIE;
+    DMA2_Stream2 -> CR |= DMA_SxCR_TCIE;
+    DMA2_Stream6 -> CR |= DMA_SxCR_TCIE;
+    DMA2_Stream7 -> CR |= DMA_SxCR_TCIE;
+
+    DMA2_Stream1 -> CR &=~(DMA_SxCR_DIR_0 | DMA_SxCR_DIR_1);
+    DMA2_Stream2 -> CR &=~(DMA_SxCR_DIR_0 | DMA_SxCR_DIR_1);
+    DMA2_Stream6 -> CR |= DMA_SxCR_DIR_0;
+    DMA2_Stream7 -> CR |= DMA_SxCR_DIR_0;
+
+
+    NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+    NVIC_EnableIRQ(DMA2_Stream1_IRQn);
+    NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+    NVIC_EnableIRQ(DMA2_Stream6_IRQn);
 }
