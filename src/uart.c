@@ -211,3 +211,14 @@ static void uart_dma_init(char *u1_dst, uint16_t u1_len, char *u2_dst, uint16_t 
     NVIC_EnableIRQ(DMA1_Stream5_IRQn);
     NVIC_EnableIRQ(DMA1_Stream6_IRQn);
 }
+
+void uart_write_dma(DMA_Stream_TypeDef *dtstr, uint32_t memptr, uint16_t dtlngth){
+
+    while(dtstr -> CR & DMA_SxCR_EN){}
+
+    dtstr -> M0AR = memptr;
+
+    dtstr -> NDTR = dtlngth;
+
+    dtstr -> CR |= DMA_SxCR_EN;
+}

@@ -30,13 +30,7 @@ void DMA2_Stream1_IRQHandler(void){
         return;
     }
 
-    while(DMA1_Stream6 -> CR & DMA_SxCR_EN){}
-
-    DMA1_Stream6 -> M0AR = (uint32_t)u6_rx_buf;
-
-    DMA1_Stream6 -> NDTR = (uint16_t)sizeof(u6_rx_buf);
-
-    DMA1_Stream6 -> CR |= DMA_SxCR_EN;
+    uart_write_dma(DMA1_Stream6, (uint32_t)u6_rx_buf, (uint16_t)sizeof(u6_rx_buf));
 
     DMA2 -> LIFCR |= (DMA_LIFCR_CFEIF1 | DMA_LIFCR_CDMEIF1 | DMA_LIFCR_CTEIF1 | DMA_LIFCR_CHTIF1 | DMA_LIFCR_CTCIF1);
 }
@@ -62,13 +56,7 @@ void DMA1_Stream5_IRQHandler(void){
         return;
     }
 
-    while(DMA2_Stream7 -> CR & DMA_SxCR_EN){}
-    
-    DMA2_Stream7 -> M0AR = (uint32_t)u2_rx_buf;
-
-    DMA2_Stream7 -> NDTR = (uint16_t)sizeof(u2_rx_buf);
-
-    DMA2_Stream7 -> CR |= DMA_SxCR_EN;
+    uart_write_dma(DMA2_Stream7, (uint32_t)u2_rx_buf, (uint16_t)sizeof(u2_rx_buf));
 
     DMA1 -> HIFCR |= (DMA_HIFCR_CFEIF5 | DMA_HIFCR_CDMEIF5 | DMA_HIFCR_CTEIF5 | DMA_HIFCR_CHTIF5 | DMA_HIFCR_CTCIF5);
 }
