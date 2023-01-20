@@ -11,6 +11,6 @@
 			"stm32f4xx.h": "c",
 			"stm32f4xx_conf.h": "c"
 		},
-		"cortex-debug.variableUseNaturalFormat": false
+		"cortex-debug.variableUseNaturalFormat": true
 	}
 }

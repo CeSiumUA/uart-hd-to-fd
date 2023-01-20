@@ -1,12 +1,13 @@
 #include "uart.h"
 
 static uint16_t compute_bd(uint32_t periph_clk, uint32_t baud_rate);
+static void uart_enable(void);
 static void uart_init_rcc(void);
 static void uart_init_gpio_modes(void);
 static void uart_set_baudrates(uint16_t bd);
 static void uart_dma_enable(void);
 static void uart_rt_enable(void);
-static void uart_dma_init(void);
+static void uart_dma_init(char *u1_dst, uint16_t u1_len, char *u2_dst, uint16_t u2_len, char *u6_dst, uint16_t u6_len);
 
 static void uart_init_gpio_modes(void){
 
@@ -53,7 +54,7 @@ static void uart_init_rcc(void){
     RCC -> APB1ENR |= RCC_APB1ENR_USART2EN;
 }
 
-void uart_init_periph(void){
+void uart_init_periph(char *u1_dst, uint16_t u1_len, char *u2_dst, uint16_t u2_len, char *u6_dst, uint16_t u6_len){
     USART_DeInit(USART1);
     USART_DeInit(USART6);
     USART_DeInit(USART2);
@@ -66,7 +67,8 @@ void uart_init_periph(void){
     uart_set_baudrates(bd);
     uart_rt_enable();
     uart_dma_enable();
-    uart_dma_init();
+    uart_dma_init(u1_dst, u1_len, u2_dst, u2_len, u6_dst, u6_len);
+    uart_enable();
 }
 
 static uint16_t compute_bd(uint32_t periph_clk, uint32_t baud_rate){
@@ -95,7 +97,13 @@ static void uart_dma_enable(void){
     USART2 -> CR3 |= USART_CR3_DMAT;
 }
 
-static void uart_dma_init(void){
+static void uart_enable(void){
+    USART1 -> CR1 |= USART_CR1_UE;
+    USART2 -> CR1 |= USART_CR1_UE;
+    USART6 -> CR1 |= USART_CR1_UE;
+}
+
+static void uart_dma_init(char *u1_dst, uint16_t u1_len, char *u2_dst, uint16_t u2_len, char *u6_dst, uint16_t u6_len){
     // USART6 TX
     DMA_DeInit(DMA2_Stream6);
     // USART1 TX
@@ -137,6 +145,24 @@ static void uart_dma_init(void){
     DMA1 -> HIFCR |= (DMA_HIFCR_CFEIF5 | DMA_HIFCR_CDMEIF5 | DMA_HIFCR_CTEIF5 | DMA_HIFCR_CHTIF5 | DMA_HIFCR_CTCIF5);
     DMA1 -> HIFCR |= (DMA_HIFCR_CFEIF6 | DMA_HIFCR_CDMEIF6 | DMA_HIFCR_CTEIF6 | DMA_HIFCR_CHTIF6 | DMA_HIFCR_CTCIF6);
 
+    DMA1_Stream5 -> PAR = (uint32_t)&(USART2 -> DR);
+    DMA1_Stream6 -> PAR = (uint32_t)&(USART2 -> DR);
+
+    DMA2_Stream1 -> PAR = (uint32_t)&(USART6 -> DR);
+    DMA2_Stream6 -> PAR = (uint32_t)&(USART6 -> DR);
+
+    DMA2_Stream2 -> PAR = (uint32_t)&(USART1 -> DR);
+    DMA2_Stream7 -> PAR = (uint32_t)&(USART1 -> DR);
+
+    DMA1_Stream5 -> M0AR = (uint32_t)u2_dst;
+    DMA1_Stream5 -> NDTR = u2_len;
+
+    DMA2_Stream2 -> M0AR = (uint32_t)u1_dst;
+    DMA2_Stream2 -> NDTR = u1_len;
+
+    DMA2_Stream1 -> M0AR = (uint32_t)u6_dst;
+    DMA2_Stream1 -> NDTR = u6_len;
+
     DMA2_Stream1 -> CR |= (DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_0);
 
     DMA2_Stream2 -> CR |= DMA_SxCR_CHSEL_2;
@@ -176,10 +202,7 @@ static void uart_dma_init(void){
 
     DMA2_Stream1 -> CR |= DMA_SxCR_EN;
     DMA2_Stream2 -> CR |= DMA_SxCR_EN;
-    DMA2_Stream6 -> CR |= DMA_SxCR_EN;
-    DMA2_Stream7 -> CR |= DMA_SxCR_EN;
     DMA1_Stream5 -> CR |= DMA_SxCR_EN;
-    DMA1_Stream6 -> CR |= DMA_SxCR_EN;
 
     NVIC_EnableIRQ(DMA2_Stream2_IRQn);
     NVIC_EnableIRQ(DMA2_Stream1_IRQn);
