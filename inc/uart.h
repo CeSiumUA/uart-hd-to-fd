@@ -5,4 +5,6 @@
 
 #define RX_SPEED    420000
 
+void uart_init_periph(void);
+
 #endif
