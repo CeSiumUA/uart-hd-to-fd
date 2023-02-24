@@ -56,7 +56,7 @@ void DMA1_Stream5_IRQHandler(void){
         return;
     }
 
-    uart_write_dma(DMA2_Stream7, (uint32_t)u2_rx_buf, (uint16_t)sizeof(u2_rx_buf));
+    uart_write_dma(DMA1_Stream6, (uint32_t)u2_rx_buf, (uint16_t)sizeof(u2_rx_buf));
 
     DMA1 -> HIFCR |= (DMA_HIFCR_CFEIF5 | DMA_HIFCR_CDMEIF5 | DMA_HIFCR_CTEIF5 | DMA_HIFCR_CHTIF5 | DMA_HIFCR_CTCIF5);
 }

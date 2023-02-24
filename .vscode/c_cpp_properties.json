@@ -2,7 +2,7 @@
     "configurations": [
         {
             "name": "vscode_stm32_c_cpp_properties",
-            "compilerPath": "/usr/bin/arm-none-eabi-gcc",
+            "compilerPath": "arm-none-eabi-gcc",
             "includePath": [
                 "${workspaceRoot}/inc/",
                 "${workspaceRoot}/board_include/include/",
