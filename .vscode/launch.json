@@ -12,7 +12,7 @@
             "type": "cortex-debug",
             "servertype": "openocd",
             "configFiles": [
-                "st_nucleo_f4.cfg"
+                "/usr/share/openocd/scripts/board/st_nucleo_f4.cfg"
             ],
             "searchDir": [],
             "runToEntryPoint": "main",
