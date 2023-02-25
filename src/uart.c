@@ -39,6 +39,7 @@ static void uart_init_gpio_modes(void){
     GPIOA -> AFR[0] |= (GPIO_AF_USART2 << 12);
 
     GPIOA -> OTYPER |= GPIO_OTYPER_OT_9;
+    GPIOA -> OTYPER |= GPIO_OTYPER_OT_11;
 }
 
 static void uart_set_baudrates(uint16_t bd){
@@ -84,6 +85,7 @@ static void uart_rt_enable(void){
 
     USART6 -> CR1 |= USART_CR1_TE;
     USART6 -> CR1 |= USART_CR1_RE;
+    USART6 -> CR1 |= USART_CR3_HDSEL;
 
     USART2 -> CR1 |= USART_CR1_TE;
     USART2 -> CR1 |= USART_CR1_RE;
