@@ -85,7 +85,7 @@ static void uart_rt_enable(void){
 
     USART6 -> CR1 |= USART_CR1_TE;
     USART6 -> CR1 |= USART_CR1_RE;
-    USART6 -> CR1 |= USART_CR3_HDSEL;
+    USART6 -> CR3 |= USART_CR3_HDSEL;
 
     USART2 -> CR1 |= USART_CR1_TE;
     USART2 -> CR1 |= USART_CR1_RE;
