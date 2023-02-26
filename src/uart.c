@@ -23,29 +23,18 @@ static void uart_init_gpio_modes(void){
     GPIOA -> MODER |= GPIO_MODER_MODER12_1;
     GPIOA -> MODER &=~GPIO_MODER_MODER12_0;
 
-    //GPIOA -> MODER |= GPIO_MODER_MODER2_1;
-    //GPIOA -> MODER &=~GPIO_MODER_MODER2_0;
-
-    //GPIOA -> MODER |= GPIO_MODER_MODER3_1;
-    //GPIOA -> MODER &=~GPIO_MODER_MODER3_0;
-
     GPIOA -> AFR[1] |= (GPIO_AF_USART1 << 4);
     GPIOA -> AFR[1] |= (GPIO_AF_USART1 << 8);
 
     GPIOA -> AFR[1] |= (GPIO_AF_USART6 << 12);
     GPIOA -> AFR[1] |= (GPIO_AF_USART6 << 16);
 
-    //GPIOA -> AFR[0] |= (GPIO_AF_USART2 << 8);
-    //GPIOA -> AFR[0] |= (GPIO_AF_USART2 << 12);
-
     GPIOA -> OTYPER |= GPIO_OTYPER_OT_9;
-    //GPIOA -> OTYPER |= GPIO_OTYPER_OT_11;
 }
 
 static void uart_set_baudrates(uint16_t bd){
     USART1 -> BRR = bd;
     USART6 -> BRR = bd;
-    //USART2 -> BRR = bd;
 }
 
 static void uart_init_rcc(void){
@@ -54,13 +43,11 @@ static void uart_init_rcc(void){
 
     RCC -> APB2ENR |= RCC_APB2ENR_USART1EN;
     RCC -> APB2ENR |= RCC_APB2ENR_USART6EN;
-    //RCC -> APB1ENR |= RCC_APB1ENR_USART2EN;
 }
 
 void uart_init_periph(char *u1_dst, uint16_t u1_len, char *u6_dst, uint16_t u6_len){
     USART_DeInit(USART1);
     USART_DeInit(USART6);
-    //USART_DeInit(USART2);
 
     uart_init_rcc();
     uart_init_gpio_modes();
@@ -79,16 +66,11 @@ static uint16_t compute_bd(uint32_t periph_clk, uint32_t baud_rate){
 }
 
 static void uart_rt_enable(void){
-    //USART1 -> CR1 |= USART_CR1_TE;
     USART1 -> CR1 |= USART_CR1_RE;
     USART1 -> CR3 |= USART_CR3_HDSEL;
 
     USART6 -> CR1 |= USART_CR1_TE;
     USART6 -> CR1 |= USART_CR1_RE;
-    //USART6 -> CR3 |= USART_CR3_HDSEL;
-
-    //USART2 -> CR1 |= USART_CR1_TE;
-    //USART2 -> CR1 |= USART_CR1_RE;
 }
 
 static void uart_dma_enable(void){
@@ -97,14 +79,10 @@ static void uart_dma_enable(void){
 
     USART6 -> CR3 |= USART_CR3_DMAR;
     USART6 -> CR3 |= USART_CR3_DMAT;
-
-    //USART2 -> CR3 |= USART_CR3_DMAR;
-    //USART2 -> CR3 |= USART_CR3_DMAT;
 }
 
 static void uart_enable(void){
     USART1 -> CR1 |= USART_CR1_UE;
-    //USART2 -> CR1 |= USART_CR1_UE;
     USART6 -> CR1 |= USART_CR1_UE;
 }
 
@@ -117,19 +95,8 @@ static void uart_dma_init(char *u1_dst, uint16_t u1_len, char *u6_dst, uint16_t 
     DMA_DeInit(DMA2_Stream1);
     // USART1 RX
     DMA_DeInit(DMA2_Stream2);
-    // USART2 RX
-    //DMA_DeInit(DMA1_Stream5);
-    // USART2 TX
-    //DMA_DeInit(DMA1_Stream6);
 
-    //RCC -> AHB1ENR |= RCC_AHB1ENR_DMA1EN;
     RCC -> AHB1ENR |= RCC_AHB1ENR_DMA2EN;
-
-    //DMA1_Stream5 -> CR &=~DMA_SxCR_EN;
-    //while(DMA1_Stream5 -> CR & DMA_SxCR_EN){}
-
-    //DMA1_Stream6 -> CR &=~DMA_SxCR_EN;
-    //while(DMA1_Stream6 -> CR & DMA_SxCR_EN){}
 
     DMA2_Stream1 -> CR &=~DMA_SxCR_EN;
     while(DMA2_Stream1 -> CR & DMA_SxCR_EN){}
@@ -147,20 +114,12 @@ static void uart_dma_init(char *u1_dst, uint16_t u1_len, char *u6_dst, uint16_t 
     DMA2 -> LIFCR |= (DMA_LIFCR_CFEIF2 | DMA_LIFCR_CDMEIF2 | DMA_LIFCR_CTEIF2 | DMA_LIFCR_CHTIF2 | DMA_LIFCR_CTCIF2);
     DMA2 -> HIFCR |= (DMA_HIFCR_CFEIF6 | DMA_HIFCR_CDMEIF6 | DMA_HIFCR_CTEIF6 | DMA_HIFCR_CHTIF6 | DMA_HIFCR_CTCIF6);
     DMA2 -> LIFCR |= (DMA_LIFCR_CFEIF1 | DMA_LIFCR_CDMEIF1 | DMA_LIFCR_CTEIF1 | DMA_LIFCR_CHTIF1 | DMA_LIFCR_CTCIF1);
-    //DMA1 -> HIFCR |= (DMA_HIFCR_CFEIF5 | DMA_HIFCR_CDMEIF5 | DMA_HIFCR_CTEIF5 | DMA_HIFCR_CHTIF5 | DMA_HIFCR_CTCIF5);
-    //DMA1 -> HIFCR |= (DMA_HIFCR_CFEIF6 | DMA_HIFCR_CDMEIF6 | DMA_HIFCR_CTEIF6 | DMA_HIFCR_CHTIF6 | DMA_HIFCR_CTCIF6);
-
-    //DMA1_Stream5 -> PAR = (uint32_t)&(USART2 -> DR);
-    //DMA1_Stream6 -> PAR = (uint32_t)&(USART2 -> DR);
 
     DMA2_Stream1 -> PAR = (uint32_t)&(USART6 -> DR);
     DMA2_Stream6 -> PAR = (uint32_t)&(USART6 -> DR);
 
     DMA2_Stream2 -> PAR = (uint32_t)&(USART1 -> DR);
     DMA2_Stream7 -> PAR = (uint32_t)&(USART1 -> DR);
-
-    //DMA1_Stream5 -> M0AR = (uint32_t)u2_dst;
-    //DMA1_Stream5 -> NDTR = u2_len;
 
     DMA2_Stream2 -> M0AR = (uint32_t)u1_dst;
     DMA2_Stream2 -> NDTR = u1_len;
@@ -176,45 +135,32 @@ static void uart_dma_init(char *u1_dst, uint16_t u1_len, char *u6_dst, uint16_t 
 
     DMA2_Stream7 -> CR |= DMA_SxCR_CHSEL_2;
 
-    //DMA1_Stream5 -> CR |= DMA_SxCR_CHSEL_2;
-
-    //DMA1_Stream6 -> CR |= DMA_SxCR_CHSEL_2;
-
     DMA2_Stream1 -> CR |= DMA_SxCR_CIRC;
     DMA2_Stream2 -> CR |= DMA_SxCR_CIRC;
-    //DMA1_Stream5 -> CR |= DMA_SxCR_CIRC;
 
     DMA2_Stream1 -> CR |= DMA_SxCR_MINC;
     DMA2_Stream2 -> CR |= DMA_SxCR_MINC;
     DMA2_Stream6 -> CR |= DMA_SxCR_MINC;
     DMA2_Stream7 -> CR |= DMA_SxCR_MINC;
-    //DMA1_Stream5 -> CR |= DMA_SxCR_MINC;
-    //DMA1_Stream6 -> CR |= DMA_SxCR_MINC;
 
     DMA2_Stream1 -> CR |= DMA_SxCR_TCIE;
     DMA2_Stream2 -> CR |= DMA_SxCR_TCIE;
     DMA2_Stream6 -> CR |= DMA_SxCR_TCIE;
     DMA2_Stream7 -> CR |= DMA_SxCR_TCIE;
-    //DMA1_Stream5 -> CR |= DMA_SxCR_TCIE;
-    //DMA1_Stream6 -> CR |= DMA_SxCR_TCIE;
 
     DMA2_Stream1 -> CR &=~(DMA_SxCR_DIR_0 | DMA_SxCR_DIR_1);
     DMA2_Stream2 -> CR &=~(DMA_SxCR_DIR_0 | DMA_SxCR_DIR_1);
-    //DMA1_Stream5 -> CR &=~(DMA_SxCR_DIR_0 | DMA_SxCR_DIR_1);
+
     DMA2_Stream6 -> CR |= DMA_SxCR_DIR_0;
     DMA2_Stream7 -> CR |= DMA_SxCR_DIR_0;
-    //DMA1_Stream6 -> CR |= DMA_SxCR_DIR_0;
 
     DMA2_Stream1 -> CR |= DMA_SxCR_EN;
     DMA2_Stream2 -> CR |= DMA_SxCR_EN;
-    //DMA1_Stream5 -> CR |= DMA_SxCR_EN;
 
     NVIC_EnableIRQ(DMA2_Stream2_IRQn);
     NVIC_EnableIRQ(DMA2_Stream1_IRQn);
     NVIC_EnableIRQ(DMA2_Stream7_IRQn);
     NVIC_EnableIRQ(DMA2_Stream6_IRQn);
-    //NVIC_EnableIRQ(DMA1_Stream5_IRQn);
-    //NVIC_EnableIRQ(DMA1_Stream6_IRQn);
 }
 
 void uart_write_dma(DMA_Stream_TypeDef *dtstr, uint32_t memptr, uint16_t dtlngth){
